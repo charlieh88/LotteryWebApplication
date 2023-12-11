@@ -31,8 +31,24 @@ def register():
 
         # if email already exists redirect user back to signup page with error message so user can try again
         if user:
+            flash('True')
             flash('Email address already exists')
             return render_template('users/register.html', form=form)
+
+            # Checks to make sure firstname and lastname do not contain characters that are not allowed. return to registration page if true.
+            input_firstname = form.firstname.data
+            input_lastname = form.lastname.data
+            characters = ['*', '?', '!', '^', '+', '%', '&', '/', '(', ')', '=', '}', ']', '[', '{', '$', '#', '@', '<',
+                          '>']
+            res = any(ele in input_firstname for ele in characters)
+            if res == True:
+                flash('Error with firstname, included disallowed characters.')
+                return render_template('users/register.html', form=form)
+
+            res = any(ele in input_lastname for ele in characters)
+            if res == True:
+                flash('Error with lastname, included disallowed characters.')
+                return render_template('users/register.html', form=form)
 
         # create a new user with the form data
         new_user = User(email=form.email.data,
