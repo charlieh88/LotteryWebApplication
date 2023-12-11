@@ -1,7 +1,7 @@
 from app import db, app
 from flask_login import UserMixin
 
-
+# noinspection PyUnresolvedReferences
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
@@ -10,13 +10,12 @@ class User(db.Model, UserMixin):
     # User authentication information.
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
-
     # User information
     firstname = db.Column(db.String(100), nullable=False)
     lastname = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(100), nullable=False, default='user')
-
+    ##pin_key = db.Colomn(db.String(32), nullable=False, default=pytop.random_base32())
     # Define the relationship to Draw
     draws = db.relationship('Draw')
 
@@ -28,6 +27,11 @@ class User(db.Model, UserMixin):
         self.password = password
         self.role = role
 
+    def get_2fa_uri(self):
+        return str(pyotp.totp.TOTP(self.pin_key).provisioning_uri(
+            email = self.email,
+        issuer_name = 'CSC2031 Coursework')
+        )
 
 class Draw(db.Model):
     __tablename__ = 'draws'
