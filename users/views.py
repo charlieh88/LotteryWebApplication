@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for
 from app import db
 from models import User
 from users.forms import RegisterForm
+import re
 
 # CONFIG
 users_blueprint = Blueprint('users', __name__, template_folder='templates')
@@ -17,6 +18,14 @@ def register():
 
     # if request method is POST or form is valid
     if form.validate_on_submit():
+        # checks to make sure there was a valid email address inputted, if not, sends user back to registration page
+        input_email = form.email.data
+        if re.match(r"[^@]+@[^@]+\.[^@]+", input_email):
+            imputEmail = True
+        else:
+            flash('Invalid email address')
+            return render_template('users/register.html', form=form)
+
         user = User.query.filter_by(email=form.email.data).first()
         # if this returns a user, then the email already exists in database
 
