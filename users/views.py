@@ -54,7 +54,7 @@ def register():
             if len(input_phone) != 13:
                 flash('Phone number entered incorrectly')
                 return render_template('users/register.html', form=form)
-            letters = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+            numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
             c = 0
             for i in input_phone:
                 if c == 4 or c == 8:
@@ -62,7 +62,7 @@ def register():
                         flash('Phone number entered incorrectly')
                         return render_template('users/register.html', form=form)
                 else:
-                    res = any(ele in i for ele in letters)
+                    res = any(ele in i for ele in numbers)
                     if res == False:
                         flash('Phone number entered incorrectly')
                         return render_template('users/register.html', form=form)
