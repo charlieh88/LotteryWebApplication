@@ -49,7 +49,24 @@ def register():
             if res == True:
                 flash('Error with lastname, included disallowed characters.')
                 return render_template('users/register.html', form=form)
-
+            # Checks to make sure phone number is written in form XXXX-XXX-XXXX, if not returns to register page with error message.
+            input_phone = form.phone.data
+            if len(input_phone) != 13:
+                flash('Phone number entered incorrectly')
+                return render_template('users/register.html', form=form)
+            letters = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+            c = 0
+            for i in input_phone:
+                if c == 4 or c == 8:
+                    if i != '-':
+                        flash('Phone number entered incorrectly')
+                        return render_template('users/register.html', form=form)
+                else:
+                    res = any(ele in i for ele in letters)
+                    if res == False:
+                        flash('Phone number entered incorrectly')
+                        return render_template('users/register.html', form=form)
+                c += 1
         # create a new user with the form data
         new_user = User(email=form.email.data,
                         firstname=form.firstname.data,
