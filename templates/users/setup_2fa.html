@@ -4,5 +4,6 @@
     <p>To set up 2-factor authentication under the email {{ email }},
     scan the following QR code with your smartphone's authenticator app:</p>
     <p><img src="{{qrcode(uri, box_size=5, border=5)}}"></p>
+    <p>To set up, scan the QR code.</p>
     <p>Once set up, please go to the <a href="{{url_for('users.login')}}"><u>Login</u></a></p>
 {% endblock %}

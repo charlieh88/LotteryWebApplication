@@ -1,8 +1,11 @@
-from flask import Blueprint, render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for, session
 from app import db
 from models import User
 from users.forms import RegisterForm
 import re
+from datetime import datetime
+import numbers
+
 # CONFIG
 users_blueprint = Blueprint('users', __name__, template_folder='templates')
 
@@ -16,6 +19,7 @@ def register():
 
     # if request method is POST or form is valid
     if form.validate_on_submit():
+
         #checks to make sure there was a valid email address inputted, if not, sends user back to registration page
         input_email = form.email.data
         if re.match(r"[^@]+@[^@]+\.[^@]+", input_email):
@@ -97,7 +101,38 @@ def register():
         if input_confirm_password != input_password:
             flash('Passwords must match')
             return render_template('users/register.html', form=form)
+        #checks to make sure Date of Birth is entered correctly.
+        input_DOB = form.DOB.data
+        try:
+            # Attempt to parse the input date in the format DD/MM/YYYY
+            parsed_date = datetime.strptime(input_DOB, '%d/%m/%Y')
 
+            # Validate day, month, and year
+            if 1 <= parsed_date.day <= 31 and 1 <= parsed_date.month <= 12:
+                if parsed_date.year // 100 == 19 or parsed_date.year // 100 == 20:
+                    # Convert the date to the desired format
+                    input_DOB = parsed_date.date()
+                else:
+                    raise ValueError('Invalid year. Please use 19YY or 20YY.')
+            else:
+                raise ValueError('Invalid day or month.')
+
+        except ValueError as e:
+            flash(f'Invalid date format: {str(e)}')
+            return render_template('users/register.html', form=form)
+
+
+        #checks to make sure that postcode is entered correctly
+        input_postcode = form.postcode.data
+        valid_postcode_formats = [
+            re.compile(r'^[A-Z]{2}\d{1,2}\s?\d[A-Z]{2}$'),
+            re.compile(r'^[A-Z]{1}\d{2}\s?\d[A-Z]{2}$'),
+            re.compile(r'^[A-Z]{2}\d{1,2}[A-Z]{3}$')
+        ]
+
+        if not any(pattern.match(input_postcode) for pattern in valid_postcode_formats):
+            flash('Invalid postcode format. Please use a valid postcode.')
+            return render_template('users/register.html', form=form)
 
         # create a new user with the form data
         new_user = User(email=form.email.data,
@@ -105,7 +140,10 @@ def register():
                         lastname=form.lastname.data,
                         phone=form.phone.data,
                         password=form.password.data,
-                        role='user')
+                        role='user',
+                        DOB=form.DOB.data,
+                        postcode=form.postcode.data
+                        )
 
         # add the new user to the database
         db.session.add(new_user)
@@ -126,7 +164,7 @@ def setup_2fa():
         return redirect(url_for('login.html'))
     del session['email']
 
-    return render_template('users/setup2fa.html', email=user.email, uri = user.get_2fa_uri()),\
+    return render_template('users/setup_2fa.html', email=user.email, uri = user.get_2fa_uri()),\
            200, {
                     'Cache-Control': 'no-cache, no-store, must-revalidate',
                     'Pragma': 'no-cache',

@@ -9,4 +9,7 @@ class RegisterForm(FlaskForm):
     phone = StringField()
     password = PasswordField()
     confirm_password = PasswordField()
+    DOB = StringField()
+    postcode = StringField()
     submit = SubmitField()
+
