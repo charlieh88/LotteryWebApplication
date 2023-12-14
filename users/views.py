@@ -1,9 +1,11 @@
+
+
 from flask import Blueprint, render_template, flash, redirect, url_for, session
 from sqlalchemy import null
 
 from app import db
 from models import User
-from users.forms import RegisterForm, LoginForm
+from users.forms import RegisterForm, LoginForm, ChangePasswordForm
 import re
 from datetime import datetime
 from flask_login import login_user, logout_user, current_user
@@ -262,12 +264,7 @@ def account():
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))
-    return render_template('users/account.html',
-                           acc_no="PLACEHOLDER FOR USER ID",
-                           email="PLACEHOLDER FOR USER EMAIL",
-                           firstname="PLACEHOLDER FOR USER FIRSTNAME",
-                           lastname="PLACEHOLDER FOR USER LASTNAME",
-                           phone="PLACEHOLDER FOR USER PHONE")
+    return render_template('users/account.html')
 
 
 #Logout function
@@ -279,3 +276,58 @@ def logout():
     logout_user()
     flash('Successfully logged out')
     return redirect(url_for('index'))
+
+@users_blueprint.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if current_user.is_anonymous == True:
+        flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
+
+    form = ChangePasswordForm()
+
+    if form.validate_on_submit():
+
+        if current_user.password != form.oldpassword.data:
+            flash('Incorrect old password')
+            return render_template('users/change_password.html', form=form)
+        if form.newpassword.data == current_user.password:
+            flash('New and Old passwords must not match')
+            return render_template('users/change_password.html', form=form)
+
+        input_password = form.newpassword.data
+        if not (len(input_password) > 6 and len(input_password) < 12) == True:
+            flash('New password must be between 6 and 12 characters long')
+            return render_template('users/change_password.html', form=form)
+        numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+        res = any(ele in input_password for ele in numbers)
+        if res == False:
+            flash('New password must contain at least 1 digit')
+            return render_template('users/change_password.html', form=form)
+        lower = False
+        for i in input_password:
+            if i.islower():
+                lower = True
+        if lower == False:
+            flash('New password must contain at least one lower case letter')
+            return render_template('users/change_password.html', form=form)
+        upper = False
+        for i in input_password:
+            if i.isupper():
+                upper = True
+        if upper == False:
+            flash('New password must contain at least one upper case letter')
+            return render_template('users/change_password.html', form=form)
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+        if (regex.search(input_password) == None):
+            flash('New password must contain at least 1 special character')
+            return render_template('users/change_password.html', form=form)
+
+        input_confirm_password = form.confirmpassword.data
+        if input_confirm_password != input_password:
+            flash('New passwords must match')
+            return render_template('users/change_password.html', form=form)
+        current_user.password = form.newpassword.data
+        db.session.commit()
+        flash('Password changed successfully')
+        return redirect(url_for('users.account'))
+    return render_template('users/change_password.html', form=form)

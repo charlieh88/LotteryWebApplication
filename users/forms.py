@@ -1,6 +1,5 @@
 from flask_wtf import FlaskForm, RecaptchaField
-from wtforms import StringField, SubmitField, PasswordField
-
+from wtforms import StringField, SubmitField, PasswordField, BooleanField
 
 
 class RegisterForm(FlaskForm):
@@ -24,3 +23,8 @@ class LoginForm(FlaskForm):
     login = SubmitField()
 
 
+class ChangePasswordForm(FlaskForm):
+    oldpassword = PasswordField()
+    newpassword = PasswordField()
+    confirmpassword = PasswordField()
+    submit = SubmitField()
