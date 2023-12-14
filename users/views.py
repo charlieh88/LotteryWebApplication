@@ -15,6 +15,9 @@ users_blueprint = Blueprint('users', __name__, template_folder='templates')
 
 @users_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_anonymous == False:
+        flash('Cannot access that page')
+        return redirect(url_for('index'))
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -45,9 +48,9 @@ def login():
         pin_key = user.pin_key
         if pyotp.TOTP(pin_key).verify(form.pin.data) == False:
             flash('Incorrect Pin Key')
-            return redirect(url_for('index'))
+            return render_template('users/login.html', form=form)
         login_user(user)
-        return render_template('users/account.html')
+        return render_template('lottery/lottery.html')
 
 
 
@@ -59,6 +62,9 @@ def login():
 # view registration
 @users_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_anonymous == False:
+        flash('Cannot access that page')
+        return redirect(url_for('index'))
     # create signup form object
     form = RegisterForm()
 

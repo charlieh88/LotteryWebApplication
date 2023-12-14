@@ -15,6 +15,9 @@ def admin():
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))
+    if current_user.role == 'user':
+        flash('Must be admin to access that page')
+        return redirect(url_for('index'))
     return render_template('admin/admin.html', name="PLACEHOLDER FOR FIRSTNAME")
 
 
@@ -23,6 +26,9 @@ def admin():
 def generate_winning_draw():
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
+    if current_user.role == 'user':
+        flash('Must be admin to access that page')
         return redirect(url_for('index'))
     # get current winning draw
     current_winning_draw = Draw.query.filter_by(master_draw=True).first()
@@ -63,6 +69,9 @@ def view_winning_draw():
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))
+    if current_user.role == 'user':
+        flash('Must be admin to access that page')
+        return redirect(url_for('index'))
     # get winning draw from DB
     current_winning_draw = Draw.query.filter_by(master_draw=True,been_played=False).first()
 
@@ -81,6 +90,9 @@ def view_winning_draw():
 def run_lottery():
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
+    if current_user.role == 'user':
+        flash('Must be admin to access that page')
         return redirect(url_for('index'))
     # get current unplayed winning draw
     current_winning_draw = Draw.query.filter_by(master_draw=True, been_played=False).first()
@@ -146,6 +158,9 @@ def view_all_users():
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))
+    if current_user.role == 'user':
+        flash('Must be admin to access that page')
+        return redirect(url_for('index'))
     current_users = User.query.filter_by(role='user').all()
 
     return render_template('admin/admin.html', name="PLACEHOLDER FOR FIRSTNAME", current_users=current_users)
@@ -156,6 +171,9 @@ def view_all_users():
 def logs():
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
+    if current_user.role == 'user':
+        flash('Must be admin to access that page')
         return redirect(url_for('index'))
     with open("lottery.log", "r") as f:
         content = f.read().splitlines()[-10:]

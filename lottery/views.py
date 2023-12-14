@@ -35,7 +35,7 @@ def create_draw():
                           + str(form.number5.data) + ' '
                           + str(form.number6.data))
         # create a new draw with the form data.
-        new_draw = Draw(user_id=1, numbers=submitted_numbers, master_draw=False, lottery_round=0)
+        new_draw = Draw(user_id=current_user.id, numbers=submitted_numbers, master_draw=False, lottery_round=0)
         # add the new draw to the database
         db.session.add(new_draw)
         db.session.commit()
@@ -54,7 +54,7 @@ def view_draws():
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))
     # get all draws that have not been played [played=0]
-    playable_draws = Draw.query.filter_by(been_played=False).all()
+    playable_draws = Draw.query.filter_by(user_id=current_user.id).all()
 
     # if playable draws exist
     if len(playable_draws) != 0:
@@ -73,10 +73,11 @@ def check_draws():
         return redirect(url_for('index'))
     # get played draws
     played_draws = Draw.query.filter_by(been_played=True).all()
+    user_played_draws = [draw for draw in played_draws if draw.user_id == current_user.id]
 
     # if played draws exist
-    if len(played_draws) != 0:
-        return render_template('lottery/lottery.html', results=played_draws, played=True)
+    if len(user_played_draws) != 0:
+        return render_template('lottery/lottery.html', results=user_played_draws, played=True)
 
     # if no played draws exist [all draw entries have been played therefore wait for next lottery round]
     else:
@@ -90,7 +91,7 @@ def play_again():
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))
-    Draw.query.filter_by(been_played=True, master_draw=False).delete(synchronize_session=False)
+    Draw.query.filter_by(been_played=True, master_draw=False, user_id=current_user.id).delete(synchronize_session=False)
     db.session.commit()
 
     flash("All played draws deleted.")

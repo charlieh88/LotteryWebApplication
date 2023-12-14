@@ -29,22 +29,27 @@
                             <a href="{{ url_for('index') }}" class="navbar-item">
                                Home
                             </a>
-                            <a href="{{ url_for('users.register') }}" class="navbar-item">
-                                Register
-                            </a>
-                            <a href="{{ url_for('users.login') }}" class="navbar-item">
-                                Login
-                            </a>
+                           {% if current_user.is_anonymous == True %}
+                                <a href="{{ url_for('users.register') }}" class="navbar-item">
+                                    Register
+                                </a>
+                                <a href="{{ url_for('users.login') }}" class="navbar-item">
+                                    Login
+                                </a>
+                           {% endif %}
                            {% if current_user.is_anonymous == False %}
                                 <a href="{{ url_for('lottery.lottery') }}" class="navbar-item">
                                     Lottery
                                 </a>
-                                <a href="{{ url_for('admin.admin') }}" class="navbar-item">
-                                    Admin
-                                </a>
+                                {% if current_user.role == 'admin' %}
+                                    <a href="{{ url_for('admin.admin') }}" class="navbar-item">
+                                        Admin
+                                    </a>
+                                {% endif %}
                                 <a href="{{ url_for('users.account') }}" class="navbar-item">
                                     Account
                                 </a>
+
                                 <a href="{{ url_for('users.logout') }}" class="navbar-item">
                                     Logout
                                 </a>
