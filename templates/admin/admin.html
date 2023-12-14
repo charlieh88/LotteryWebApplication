@@ -76,6 +76,8 @@
                         <th>Lastname</th>
                         <th>Phone No.</th>
                         <th>Role</th>
+                        <th>Date of Birth</th>
+                        <th>postcode</th>
                     </tr>
                     {% for user in current_users %}
                         <tr>
@@ -85,6 +87,8 @@
                             <td>{{ user.lastname }}</td>
                             <td>{{ user.phone }}</td>
                             <td>{{ user.role }}</td>
+                            <td>{{ user.DOB }}</td>
+                            <td>{{ user.postcode }}</td>
                         </tr>
                     {% endfor %}
                 </table>
