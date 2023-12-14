@@ -13,6 +13,7 @@
         {% if messages %}
             <div class="notification is-danger">
                 {{ messages[0] }}
+                {{ messages[1] }}
             </div>
         {% endif %}
     {% endwith %}
@@ -119,6 +120,16 @@
         </form>
         </div>
     </div>
+
+
+  <div class="column is-10 is-offset-1">
+
+
+    <h4 class="title is-4">New Admin User</h4>
+        <div>
+            <a href="{{ url_for('users.register')}}" class="button is-info is-centered">Add New Admin User</a>
+        </div>
+</div>
 
 
 {% endblock %}

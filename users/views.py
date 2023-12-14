@@ -74,12 +74,10 @@ def login():
 def register():
 
     if current_user.is_anonymous == False:
-        flash('Cannot access that page')
-        return redirect(url_for('index'))
-    if current_user.is_anonymous == False:
-        if current_user.role == 'admin':
-            flash('Admin cannot access this page')
-            return redirect(url_for('admin'))
+        if current_user.role == 'user':
+            flash('Cannot access that page')
+            return redirect(url_for('index'))
+
     # create signup form object
     form = RegisterForm()
 
@@ -199,23 +197,41 @@ def register():
         if not any(pattern.match(input_postcode) for pattern in valid_postcode_formats):
             flash('Invalid postcode format. Please use a valid postcode.')
             return render_template('users/register.html', form=form)
-
+        if current_user.is_anonymous == False:
+            if current_user.role == 'admin':
+                new_user = User(email=form.email.data,
+                                firstname=form.firstname.data,
+                                lastname=form.lastname.data,
+                                phone=form.phone.data,
+                                password=form.password.data,
+                                role='admin',
+                                DOB=form.DOB.data,
+                                postcode=form.postcode.data
+                                )
+        else:
         # create a new user with the form data
-        new_user = User(email=form.email.data,
-                        firstname=form.firstname.data,
-                        lastname=form.lastname.data,
-                        phone=form.phone.data,
-                        password=form.password.data,
-                        role='user',
-                        DOB=form.DOB.data,
-                        postcode=form.postcode.data
-                        )
+            new_user = User(email=form.email.data,
+                            firstname=form.firstname.data,
+                            lastname=form.lastname.data,
+                            phone=form.phone.data,
+                            password=form.password.data,
+                            role='user',
+                            DOB=form.DOB.data,
+                            postcode=form.postcode.data
+                            )
 
         # add the new user to the database
         db.session.add(new_user)
         db.session.commit()
         # setting up 2 factor authentication
         session['email'] = new_user.email
+        if current_user.is_anonymous == False:
+            if current_user.role == 'admin':
+                flash('New admin account has been created, pin key must be added manually.')
+                user = User.query.filter_by(email=session['email']).first()
+
+                flash(f'Secret Key:{user.pin_key}')
+                return render_template('admin/admin.html')
         return redirect(url_for('users.setup_2fa'))
     # if request method is GET or form not valid re-render signup page
     return render_template('users/register.html', form=form)
