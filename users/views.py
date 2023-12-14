@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, session
+from sqlalchemy import null
+
 from app import db
 from models import User
 from users.forms import RegisterForm, LoginForm
 import re
 from datetime import datetime
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, current_user
 import pyotp
 
 
@@ -218,6 +220,9 @@ def setup_2fa():
 # view user account
 @users_blueprint.route('/account')
 def account():
+    if current_user.is_anonymous == True:
+        flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
     return render_template('users/account.html',
                            acc_no="PLACEHOLDER FOR USER ID",
                            email="PLACEHOLDER FOR USER EMAIL",
@@ -229,6 +234,9 @@ def account():
 #Logout function
 @users_blueprint.route('/logout')
 def logout():
+    if current_user.is_anonymous == True:
+        flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
     logout_user()
     flash('Successfully logged out')
     return redirect(url_for('index'))

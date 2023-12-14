@@ -3,7 +3,7 @@ import random
 from flask import Blueprint, render_template, flash, redirect, url_for
 from app import db
 from models import User, Draw
-
+from flask_login import login_user, logout_user, current_user
 # CONFIG
 admin_blueprint = Blueprint('admin', __name__, template_folder='templates')
 
@@ -12,13 +12,18 @@ admin_blueprint = Blueprint('admin', __name__, template_folder='templates')
 # view admin homepage
 @admin_blueprint.route('/admin')
 def admin():
+    if current_user.is_anonymous == True:
+        flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
     return render_template('admin/admin.html', name="PLACEHOLDER FOR FIRSTNAME")
 
 
 # create a new winning draw
 @admin_blueprint.route('/generate_winning_draw')
 def generate_winning_draw():
-
+    if current_user.is_anonymous == True:
+        flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
     # get current winning draw
     current_winning_draw = Draw.query.filter_by(master_draw=True).first()
     lottery_round = 1
@@ -55,7 +60,9 @@ def generate_winning_draw():
 # view current winning draw
 @admin_blueprint.route('/view_winning_draw')
 def view_winning_draw():
-
+    if current_user.is_anonymous == True:
+        flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
     # get winning draw from DB
     current_winning_draw = Draw.query.filter_by(master_draw=True,been_played=False).first()
 
@@ -72,7 +79,9 @@ def view_winning_draw():
 # view lottery results and winners
 @admin_blueprint.route('/run_lottery')
 def run_lottery():
-
+    if current_user.is_anonymous == True:
+        flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
     # get current unplayed winning draw
     current_winning_draw = Draw.query.filter_by(master_draw=True, been_played=False).first()
 
@@ -134,6 +143,9 @@ def run_lottery():
 # view all registered users
 @admin_blueprint.route('/view_all_users')
 def view_all_users():
+    if current_user.is_anonymous == True:
+        flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
     current_users = User.query.filter_by(role='user').all()
 
     return render_template('admin/admin.html', name="PLACEHOLDER FOR FIRSTNAME", current_users=current_users)
@@ -142,6 +154,9 @@ def view_all_users():
 # view last 10 log entries
 @admin_blueprint.route('/logs')
 def logs():
+    if current_user.is_anonymous == True:
+        flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
     with open("lottery.log", "r") as f:
         content = f.read().splitlines()[-10:]
         content.reverse()

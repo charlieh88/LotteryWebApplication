@@ -35,18 +35,20 @@
                             <a href="{{ url_for('users.login') }}" class="navbar-item">
                                 Login
                             </a>
-                            <a href="{{ url_for('lottery.lottery') }}" class="navbar-item">
-                                Lottery
-                            </a>
-                            <a href="{{ url_for('admin.admin') }}" class="navbar-item">
-                                Admin
-                            </a>
-                            <a href="{{ url_for('users.account') }}" class="navbar-item">
-                                Account
-                            </a>
-                            <a href="{{ url_for('users.logout') }}" class="navbar-item">
-                                Logout
-                            </a>
+                           {% if current_user.is_anonymous == False %}
+                                <a href="{{ url_for('lottery.lottery') }}" class="navbar-item">
+                                    Lottery
+                                </a>
+                                <a href="{{ url_for('admin.admin') }}" class="navbar-item">
+                                    Admin
+                                </a>
+                                <a href="{{ url_for('users.account') }}" class="navbar-item">
+                                    Account
+                                </a>
+                                <a href="{{ url_for('users.logout') }}" class="navbar-item">
+                                    Logout
+                                </a>
+                           {% endif %}
                        </div>
                     </div>
                 </div>
