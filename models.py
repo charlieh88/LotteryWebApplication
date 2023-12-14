@@ -4,7 +4,7 @@ from app import app, db
 from flask_login import UserMixin
 import pyotp
 from datetime import datetime
-
+from cryptography.fernet import Fernet
 
 # noinspection PyUnresolvedReferences
 class User(db.Model, UserMixin):
@@ -26,6 +26,9 @@ class User(db.Model, UserMixin):
     registered_on = db.Column(db.DateTime)
     current_login = db.Column(db.DateTime, nullable=True)
     last_login = db.Column(db.DateTime, nullable=True)
+    current_IP = db.Column(db.String(100), nullable=True)
+    last_IP = db.Column(db.String(100), nullable=True)
+    total_logins = db.Column(db.Integer, default = 1)
     # Define the relationship to Draw
     draws = db.relationship('Draw')
 
@@ -41,18 +44,15 @@ class User(db.Model, UserMixin):
         self.registered_on = datetime.now()
         self.current_login = None
         self.last_login = None
+        self.current_IP = None
+        self.last_IP = None
+        self.total_logins = 1
 
 
     def get_2fa_uri(self):
         return str(pyotp.totp.TOTP(self.pin_key).provisioning_uri(
         issuer_name = 'CSC2031 Coursework')
         )
-
-
-
-class SecurityFilter(logging.Filter):
-    def filter(self, record):
-        return 'SECURITY' in record.getMessage()
 
 
 class Draw(db.Model):
@@ -78,13 +78,20 @@ class Draw(db.Model):
     # Lottery round that draw is used
     lottery_round = db.Column(db.Integer, nullable=False, default=0)
 
-    def __init__(self, user_id, numbers, master_draw, lottery_round):
+    key = db.Column(db.String(100))
+
+    def __init__(self, user_id, numbers, master_draw, lottery_round, key):
         self.user_id = user_id
         self.numbers = numbers
         self.been_played = False
         self.matches_master = False
         self.master_draw = master_draw
         self.lottery_round = lottery_round
+        self.key = key
+
+
+    def decrypt(self, data, key):
+        return Fernet(key).decrypt(data).decode('otf-8')
 
 
 def init_db():

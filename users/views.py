@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, session, logging
+from flask import Blueprint, render_template, flash, redirect, url_for, request, session, logging
 from app import db
 from models import User
 from users.forms import RegisterForm, LoginForm, ChangePasswordForm
@@ -58,6 +58,9 @@ def login():
         login_user(user)
         current_user.last_login = current_user.current_login
         current_user.current_login = datetime.now()
+        current_user.last_IP = current_user.current_IP
+        current_user.current_IP = request.remote_addr
+        current_user.total_logins = int(current_user.total_logins) + 1
         db.session.commit()
         if current_user.role == 'user':
             return render_template('lottery/lottery.html')
