@@ -1,5 +1,6 @@
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import StringField, SubmitField, PasswordField
+
 
 
 class RegisterForm(FlaskForm):
@@ -12,4 +13,13 @@ class RegisterForm(FlaskForm):
     DOB = StringField()
     postcode = StringField()
     submit = SubmitField()
+
+
+class LoginForm(FlaskForm):
+    email = StringField()
+    password = PasswordField()
+    pin = StringField()
+    recaptcha = RecaptchaField()
+    login = SubmitField()
+
 

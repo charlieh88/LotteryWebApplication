@@ -1,4 +1,5 @@
 # IMPORTS
+import os
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_qrcode import QRcode
@@ -14,6 +15,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 #application instance
 qrcode = QRcode(app)
+
+pub = '6LfdxDApAAAAAA6zgKx69oKmZGLE3EuyV5Oe6gTP'
+priv = '6LfdxDApAAAAADAX_4QCg6aakDQHXjf2Ui9IYmqH'
+
+app.config['RECAPTCHA_PUBLIC_KEY'] = pub
+app.config['RECAPTCHA_PRIVATE_KEY'] = priv
 
 #Error handling
 @app.errorhandler(400)

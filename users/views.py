@@ -1,14 +1,22 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, session
 from app import db
 from models import User
-from users.forms import RegisterForm
+from users.forms import RegisterForm, LoginForm
 import re
 from datetime import datetime
+import os
 import numbers
 
 # CONFIG
 users_blueprint = Blueprint('users', __name__, template_folder='templates')
 
+@users_blueprint.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        return redirect(url_for('users.register'))
+    return render_template('users/login.html', form=form)
 
 # VIEWS
 # view registration
@@ -170,13 +178,6 @@ def setup_2fa():
                     'Pragma': 'no-cache',
                     'Expires': '0'
                 }
-
-
-
-# view user login
-@users_blueprint.route('/login')
-def login():
-    return render_template('users/login.html')
 
 
 # view user account
