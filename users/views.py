@@ -8,19 +8,21 @@ import re
 from datetime import datetime
 from flask_login import login_user, logout_user, current_user
 import pyotp
-
+from flask_login import UserMixin, current_user
 
 # CONFIG
 users_blueprint = Blueprint('users', __name__, template_folder='templates')
 
 @users_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.role == 'admin':
-        flash('Admin cannot access this page')
-        return redirect(url_for('admin'))
+
     if current_user.is_anonymous == False:
         flash('Cannot access that page')
         return redirect(url_for('index'))
+    if current_user.is_anonymous == False:
+        if current_user.role == 'admin':
+            flash('Admin cannot access this page')
+            return redirect(url_for('admin'))
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -49,6 +51,9 @@ def login():
             flash('Incorrect postcode')
             return render_template('users/login.html', form=form)
         pin_key = user.pin_key
+        if len(form.pin.data) == 0:
+            flash('Incorrect Pin Key')
+            return render_template('users/login.html', form=form)
         if pyotp.TOTP(pin_key).verify(form.pin.data) == False:
             flash('Incorrect Pin Key')
             return render_template('users/login.html', form=form)
@@ -67,12 +72,14 @@ def login():
 # view registration
 @users_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.role == 'admin':
-        flash('Admin cannot access this page')
-        return redirect(url_for('admin'))
+
     if current_user.is_anonymous == False:
         flash('Cannot access that page')
         return redirect(url_for('index'))
+    if current_user.is_anonymous == False:
+        if current_user.role == 'admin':
+            flash('Admin cannot access this page')
+            return redirect(url_for('admin'))
     # create signup form object
     form = RegisterForm()
 
@@ -216,11 +223,10 @@ def register():
 # view 2fa
 @users_blueprint.route('/setup_2fa')
 def setup_2fa():
-    if current_user.role == 'admin':
-        flash('Admin cannot access this page')
-        return redirect(url_for('admin'))
+
     if 'email' not in session:
         return redirect(url_for('register.html'))
+
     user = User.query.filter_by(email=session['email']).first()
     if not user:
         return redirect(url_for('login.html'))

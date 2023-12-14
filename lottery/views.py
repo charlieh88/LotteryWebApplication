@@ -4,6 +4,7 @@ from app import db
 from lottery.forms import DrawForm
 from models import Draw
 from flask_login import login_user, logout_user, current_user
+from models import User
 
 # CONFIG
 lottery_blueprint = Blueprint('lottery', __name__, template_folder='templates')
@@ -16,21 +17,24 @@ def lottery():
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))
-    if current_user.role == 'admin':
-        flash('Admin cannot access this page')
-        return redirect(url_for('admin'))
+    if current_user.is_anonymous == False:
+        if current_user.role == 'admin':
+            flash('Admin cannot access this page')
+            return redirect(url_for('admin'))
     return render_template('lottery/lottery.html', name="PLACEHOLDER FOR FIRSTNAME")
 
 
 # view all draws that have not been played
 @lottery_blueprint.route('/create_draw', methods=['POST'])
 def create_draw():
-    if current_user.role == 'admin':
-        flash('Admin cannot access this page')
-        return redirect(url_for('admin'))
+
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))
+    if current_user.is_anonymous == False:
+        if current_user.role == 'admin':
+            flash('Admin cannot access this page')
+            return redirect(url_for('admin'))
     form = DrawForm()
 
     if form.validate_on_submit():
@@ -56,12 +60,14 @@ def create_draw():
 # view all draws that have not been played
 @lottery_blueprint.route('/view_draws', methods=['POST'])
 def view_draws():
-    if current_user.role == 'admin':
-        flash('Admin cannot access this page')
-        return redirect(url_for('admin'))
+
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))
+    if current_user.is_anonymous == False:
+        if current_user.role == 'admin':
+            flash('Admin cannot access this page')
+            return redirect(url_for('admin'))
     # get all draws that have not been played [played=0]
     playable_draws = Draw.query.filter_by(user_id=current_user.id).all()
 
@@ -77,12 +83,14 @@ def view_draws():
 # view lottery results
 @lottery_blueprint.route('/check_draws', methods=['POST'])
 def check_draws():
-    if current_user.role == 'admin':
-        flash('Admin cannot access this page')
-        return redirect(url_for('admin'))
+
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))
+    if current_user.is_anonymous == False:
+        if current_user.role == 'admin':
+            flash('Admin cannot access this page')
+            return redirect(url_for('admin'))
     # get played draws
     played_draws = Draw.query.filter_by(been_played=True).all()
     user_played_draws = [draw for draw in played_draws if draw.user_id == current_user.id]
@@ -100,12 +108,14 @@ def check_draws():
 # delete all played draws
 @lottery_blueprint.route('/play_again', methods=['POST'])
 def play_again():
-    if current_user.role == 'admin':
-        flash('Admin cannot access this page')
-        return redirect(url_for('admin'))
+
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))
+    if current_user.is_anonymous == False:
+        if current_user.role == 'admin':
+            flash('Admin cannot access this page')
+            return redirect(url_for('admin'))
     Draw.query.filter_by(been_played=True, master_draw=False, user_id=current_user.id).delete(synchronize_session=False)
     db.session.commit()
 
