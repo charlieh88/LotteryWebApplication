@@ -4,7 +4,7 @@ from models import User
 from users.forms import RegisterForm, LoginForm
 import re
 from datetime import datetime
-from flask_login import login_user
+from flask_login import login_user, logout_user
 import pyotp
 
 
@@ -37,13 +37,17 @@ def login():
                 return redirect(url_for('index'))
 
             flash(f'Incorrect password. Attempt number {attempts}.')
+        if user.postcode != form.postcode.data:
+            flash('Incorrect postcode')
+            return render_template('users/login.html', form=form)
         pin_key = user.pin_key
         if pyotp.TOTP(pin_key).verify(form.pin.data) == False:
             flash('Incorrect Pin Key')
             return redirect(url_for('index'))
-        else:
-            flash('yes')
-            return redirect(url_for('index'))
+        login_user(user)
+        return render_template('users/account.html')
+
+
 
 
 
@@ -220,3 +224,11 @@ def account():
                            firstname="PLACEHOLDER FOR USER FIRSTNAME",
                            lastname="PLACEHOLDER FOR USER LASTNAME",
                            phone="PLACEHOLDER FOR USER PHONE")
+
+
+#Logout function
+@users_blueprint.route('/logout')
+def logout():
+    logout_user()
+    flash('Successfully logged out')
+    return redirect(url_for('index'))

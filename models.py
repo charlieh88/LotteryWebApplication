@@ -33,6 +33,7 @@ class User(db.Model, UserMixin):
         self.DOB = DOB
         self.postcode = postcode
 
+
     def get_2fa_uri(self):
         return str(pyotp.totp.TOTP(self.pin_key).provisioning_uri(
         issuer_name = 'CSC2031 Coursework')

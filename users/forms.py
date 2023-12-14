@@ -20,6 +20,7 @@ class LoginForm(FlaskForm):
     password = PasswordField()
     pin = StringField()
     recaptcha = RecaptchaField()
+    postcode = StringField()
     login = SubmitField()
 
 
