@@ -1,6 +1,9 @@
+import logging
+
 from app import app, db
 from flask_login import UserMixin
 import pyotp
+from datetime import datetime
 
 
 # noinspection PyUnresolvedReferences
@@ -20,6 +23,9 @@ class User(db.Model, UserMixin):
     pin_key = db.Column(db.String(32), nullable=False, default=pyotp.random_base32())
     DOB = db.Column(db.String(100), nullable=False)
     postcode = db.Column(db.String(100), nullable=False)
+    registered_on = db.Column(db.DateTime)
+    current_login = db.Column(db.DateTime, nullable=True)
+    last_login = db.Column(db.DateTime, nullable=True)
     # Define the relationship to Draw
     draws = db.relationship('Draw')
 
@@ -32,12 +38,22 @@ class User(db.Model, UserMixin):
         self.role = role
         self.DOB = DOB
         self.postcode = postcode
+        self.registered_on = datetime.now()
+        self.current_login = None
+        self.last_login = None
 
 
     def get_2fa_uri(self):
         return str(pyotp.totp.TOTP(self.pin_key).provisioning_uri(
         issuer_name = 'CSC2031 Coursework')
         )
+
+
+
+class SecurityFilter(logging.Filter):
+    def filter(self, record):
+        return 'SECURITY' in record.getMessage()
+
 
 class Draw(db.Model):
     __tablename__ = 'draws'

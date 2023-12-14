@@ -1,8 +1,4 @@
-
-
-from flask import Blueprint, render_template, flash, redirect, url_for, session
-from sqlalchemy import null
-
+from flask import Blueprint, render_template, flash, redirect, url_for, session, logging
 from app import db
 from models import User
 from users.forms import RegisterForm, LoginForm, ChangePasswordForm
@@ -60,6 +56,9 @@ def login():
             flash('Incorrect Pin Key')
             return render_template('users/login.html', form=form)
         login_user(user)
+        current_user.last_login = current_user.current_login
+        current_user.current_login = datetime.now()
+        db.session.commit()
         if current_user.role == 'user':
             return render_template('lottery/lottery.html')
         else:
