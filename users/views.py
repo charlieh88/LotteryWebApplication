@@ -15,6 +15,9 @@ users_blueprint = Blueprint('users', __name__, template_folder='templates')
 
 @users_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.role == 'admin':
+        flash('Admin cannot access this page')
+        return redirect(url_for('admin'))
     if current_user.is_anonymous == False:
         flash('Cannot access that page')
         return redirect(url_for('index'))
@@ -50,8 +53,10 @@ def login():
             flash('Incorrect Pin Key')
             return render_template('users/login.html', form=form)
         login_user(user)
-        return render_template('lottery/lottery.html')
-
+        if current_user.role == 'user':
+            return render_template('lottery/lottery.html')
+        else:
+            return render_template('admin/admin.html')
 
 
 
@@ -62,6 +67,9 @@ def login():
 # view registration
 @users_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.role == 'admin':
+        flash('Admin cannot access this page')
+        return redirect(url_for('admin'))
     if current_user.is_anonymous == False:
         flash('Cannot access that page')
         return redirect(url_for('index'))
@@ -208,6 +216,9 @@ def register():
 # view 2fa
 @users_blueprint.route('/setup_2fa')
 def setup_2fa():
+    if current_user.role == 'admin':
+        flash('Admin cannot access this page')
+        return redirect(url_for('admin'))
     if 'email' not in session:
         return redirect(url_for('register.html'))
     user = User.query.filter_by(email=session['email']).first()

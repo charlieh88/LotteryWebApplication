@@ -38,9 +38,11 @@
                                 </a>
                            {% endif %}
                            {% if current_user.is_anonymous == False %}
-                                <a href="{{ url_for('lottery.lottery') }}" class="navbar-item">
-                                    Lottery
-                                </a>
+                                {% if current_user.role == 'user' %}
+                                    <a href="{{ url_for('lottery.lottery') }}" class="navbar-item">
+                                        Lottery
+                                    </a>
+                                {% endif %}
                                 {% if current_user.role == 'admin' %}
                                     <a href="{{ url_for('admin.admin') }}" class="navbar-item">
                                         Admin

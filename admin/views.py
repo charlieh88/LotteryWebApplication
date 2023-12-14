@@ -52,7 +52,7 @@ def generate_winning_draw():
     winning_numbers_string = winning_numbers_string[:-1]
 
     # create a new draw object.
-    new_winning_draw = Draw(user_id=1, numbers=winning_numbers_string, master_draw=True, lottery_round=lottery_round)
+    new_winning_draw = Draw(user_id=current_user.id, numbers=winning_numbers_string, master_draw=True, lottery_round=lottery_round)
 
     # add the new winning draw to the database
     db.session.add(new_winning_draw)
