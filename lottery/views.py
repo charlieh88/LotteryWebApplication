@@ -1,9 +1,9 @@
 # IMPORTS
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for
 from app import db
 from lottery.forms import DrawForm
 from models import Draw
-from flask_login import login_user, logout_user, current_user
+from flask_login import current_user
 from cryptography.fernet import Fernet
 # CONFIG
 lottery_blueprint = Blueprint('lottery', __name__, template_folder='templates')
@@ -37,6 +37,7 @@ def create_draw():
     form = DrawForm()
 
     if form.validate_on_submit():
+        #checking to make sure all inputs are between 1 and 60
         if int(form.number1.data) < 1 or int(form.number1.data) > 60:
             flash('Number 1 must be between 1 and 60')
             return render_template('lottery/lottery.html', name="PLACEHOLDER FOR FIRSTNAME", form=form)
@@ -55,7 +56,6 @@ def create_draw():
         if int(form.number6.data) < 1 or int(form.number6.data) > 60:
             flash('Number 6 must be between 1 and 60')
             return render_template('lottery/lottery.html', name="PLACEHOLDER FOR FIRSTNAME", form=form)
-
         submitted_numbers = (str(form.number1.data) + ' '
                           + str(form.number2.data) + ' '
                           + str(form.number3.data) + ' '
@@ -132,7 +132,7 @@ def check_draws():
 # delete all played draws
 @lottery_blueprint.route('/play_again', methods=['POST'])
 def play_again():
-
+    #making sure only verified users access this page
     if current_user.is_anonymous == True:
         flash('Must be signed in to access that page')
         return redirect(url_for('index'))

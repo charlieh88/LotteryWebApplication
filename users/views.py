@@ -1,13 +1,13 @@
-import bcrypt
-from flask import Blueprint, render_template, flash, redirect, url_for, request, session, logging
+
+from flask import Blueprint, render_template, flash, redirect, url_for, request, session
 from app import db
 from models import User
 from users.forms import RegisterForm, LoginForm, ChangePasswordForm
 import re
 from datetime import datetime
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user
 import pyotp
-from flask_login import UserMixin, current_user
+from flask_login import current_user
 
 # CONFIG
 users_blueprint = Blueprint('users', __name__, template_folder='templates')
@@ -291,14 +291,14 @@ def change_password():
     form = ChangePasswordForm()
 
     if form.validate_on_submit():
-
+        #verifying old password correlates with password entered.
         if current_user.password != form.oldpassword.data:
             flash('Incorrect old password')
             return render_template('users/change_password.html', form=form)
         if form.newpassword.data == current_user.password:
             flash('New and Old passwords must not match')
             return render_template('users/change_password.html', form=form)
-
+        #making sure new password is valid
         input_password = form.newpassword.data
         if not (len(input_password) > 6 and len(input_password) < 12) == True:
             flash('New password must be between 6 and 12 characters long')
