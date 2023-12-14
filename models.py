@@ -1,6 +1,7 @@
-from app import db, app
+from app import app, db
 from flask_login import UserMixin
 import pyotp
+
 
 # noinspection PyUnresolvedReferences
 class User(db.Model, UserMixin):

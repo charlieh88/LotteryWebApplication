@@ -4,8 +4,9 @@ from models import User
 from users.forms import RegisterForm, LoginForm
 import re
 from datetime import datetime
-import os
-import numbers
+from flask_login import login_user
+import pyotp
+
 
 # CONFIG
 users_blueprint = Blueprint('users', __name__, template_folder='templates')
@@ -15,7 +16,37 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        return redirect(url_for('users.register'))
+        user = User.query.filter_by(email=form.email.data).first()
+
+        if not user:
+            flash('True')
+            flash('Email not found in the system')
+            return render_template('users/login.html', form=form)
+
+        if user.password == form.password.data:
+            # Successful login, reset password attempt count
+            session.pop('password_attempts', None)
+        else:
+            # Incorrect password, update attempt count in session
+            attempts = session.get('password_attempts', 0) + 1
+            session['password_attempts'] = attempts
+            if attempts >= 3:
+                # send user to the homepage
+                flash('You have exeeded 3 password attempts')
+                session.pop('password_attempts', None)
+                return redirect(url_for('index'))
+
+            flash(f'Incorrect password. Attempt number {attempts}.')
+        pin_key = user.pin_key
+        if pyotp.TOTP(pin_key).verify(form.pin.data) == False:
+            flash('Incorrect Pin Key')
+            return redirect(url_for('index'))
+        else:
+            flash('yes')
+            return redirect(url_for('index'))
+
+
+
     return render_template('users/login.html', form=form)
 
 # VIEWS

@@ -1,12 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="notification is-danger">
+                        {{ messages }}
+                    </div>
+                {% endif %}
 
+
+
+{% endwith %}
 <h1 class="title">Lottery Web Application</h1>
 
 <h2 class="subtitle">CSC2031 Security & Programming Paradigms</h2>
 
 {#TODO: UPDATE WITH NAME AND STUDENT NUMBER#}
-<p>Your Name ('Your Student Number')</p>
+<p> Charlie Hines ('c1004779')</p>
 
 {% endblock %}
