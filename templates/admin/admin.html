@@ -78,6 +78,7 @@
                         <th>Role</th>
                         <th>Date of Birth</th>
                         <th>postcode</th>
+
                     </tr>
                     {% for user in current_users %}
                         <tr>
@@ -125,6 +126,47 @@
         </div>
     </div>
 
+ <div class="column is-10 is-offset-1">
+
+
+    <h4 class="title is-4">User Activity</h4>
+    <div class="box">
+        {% if current_users %}
+            <div class="field">
+                <table class="table">
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Registration</th>
+                        <th>Current Log In</th>
+                        <th>Previous Log In</th>
+                        <th>Current IP</th>
+                        <th>Previous IP</th>
+                        <th>Number of logins</th>
+
+                    </tr>
+                    {% for user in current_users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.registered_on }}</td>
+                            <td>{{ user.current_login }}</td>
+                            <td>{{ user.last_login }}</td>
+                            <td>{{ user.current_IP }}</td>
+                            <td>{{ user.last_IP }}</td>
+                            <td>{{ user.total_logins }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% endif %}
+        <form action="/view_user_activity">
+            <div>
+                <button class="button is-info is-centered">View All Users Activity</button>
+            </div>
+        </form>
+    </div>
+</div>
 
   <div class="column is-10 is-offset-1">
 

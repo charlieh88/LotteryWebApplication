@@ -180,3 +180,15 @@ def logs():
         content.reverse()
 
     return render_template('admin/admin.html', logs=content, name="PLACEHOLDER FOR FIRSTNAME")
+
+@admin_blueprint.route('/view_user_activity')
+def view_user_activity():
+    if current_user.is_anonymous == True:
+        flash('Must be signed in to access that page')
+        return redirect(url_for('index'))
+    if current_user.role == 'user':
+        flash('Must be admin to access that page')
+        return redirect(url_for('index'))
+    current_users = User.query.filter_by(role='user').all()
+
+    return render_template('admin/admin.html', name="PLACEHOLDER FOR FIRSTNAME", current_users=current_users)
