@@ -1,0 +1,4 @@
+I have put the needed information for recaptcha button in the app.py.
+currently i emptied the database, but left one last test user, an admin.
+email is: test@email.com
+password is: Testpass!1

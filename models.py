@@ -1,7 +1,4 @@
-import logging
-
-from flask_bcrypt import Bcrypt
-
+import bcrypt
 from app import app, db
 from flask_login import UserMixin
 import pyotp
