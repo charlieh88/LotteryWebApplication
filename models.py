@@ -1,10 +1,13 @@
 import logging
 
+from flask_bcrypt import Bcrypt
+
 from app import app, db
 from flask_login import UserMixin
 import pyotp
 from datetime import datetime
 from cryptography.fernet import Fernet
+
 
 # noinspection PyUnresolvedReferences
 class User(db.Model, UserMixin):
@@ -78,16 +81,16 @@ class Draw(db.Model):
     # Lottery round that draw is used
     lottery_round = db.Column(db.Integer, nullable=False, default=0)
 
-    key = db.Column(db.String(100))
 
-    def __init__(self, user_id, numbers, master_draw, lottery_round, key):
+
+    def __init__(self, user_id, numbers, master_draw, lottery_round):
         self.user_id = user_id
         self.numbers = numbers
         self.been_played = False
         self.matches_master = False
         self.master_draw = master_draw
         self.lottery_round = lottery_round
-        self.key = key
+
 
 
     def decrypt(self, data, key):

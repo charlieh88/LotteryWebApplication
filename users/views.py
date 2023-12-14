@@ -1,3 +1,4 @@
+import bcrypt
 from flask import Blueprint, render_template, flash, redirect, url_for, request, session, logging
 from app import db
 from models import User
@@ -31,7 +32,7 @@ def login():
             flash('Email not found in the system')
             return render_template('users/login.html', form=form)
 
-        if user.password == form.password.data:
+        if form.password.data == user.password:
             # Successful login, reset password attempt count
             session.pop('password_attempts', None)
         else:
@@ -40,9 +41,11 @@ def login():
             session['password_attempts'] = attempts
             if attempts >= 3:
                 # send user to the homepage
-                flash('You have exeeded 3 password attempts')
+                flash('You have exceeded 3 password attempts')
                 session.pop('password_attempts', None)
                 return redirect(url_for('index'))
+
+            flash(f'Incorrect password. Attempt number {attempts}.')
 
             flash(f'Incorrect password. Attempt number {attempts}.')
         if user.postcode != form.postcode.data:

@@ -37,6 +37,25 @@ def create_draw():
     form = DrawForm()
 
     if form.validate_on_submit():
+        if int(form.number1.data) < 1 or int(form.number1.data) > 60:
+            flash('Number 1 must be between 1 and 60')
+            return render_template('lottery/lottery.html', name="PLACEHOLDER FOR FIRSTNAME", form=form)
+        if int(form.number2.data) < 1 or int(form.number2.data) > 60:
+            flash('Number 2 must be between 1 and 60')
+            return render_template('lottery/lottery.html', name="PLACEHOLDER FOR FIRSTNAME", form=form)
+        if int(form.number3.data) < 1 or int(form.number3.data) > 60:
+            flash('Number 3 must be between 1 and 60')
+            return render_template('lottery/lottery.html', name="PLACEHOLDER FOR FIRSTNAME", form=form)
+        if int(form.number4.data) < 1 or int(form.number4.data) > 60:
+            flash('Number 4 must be between 1 and 60')
+            return render_template('lottery/lottery.html', name="PLACEHOLDER FOR FIRSTNAME", form=form)
+        if int(form.number5.data) < 1 or int(form.number5.data) > 60:
+            flash('Number 5 must be between 1 and 60')
+            return render_template('lottery/lottery.html', name="PLACEHOLDER FOR FIRSTNAME", form=form)
+        if int(form.number6.data) < 1 or int(form.number6.data) > 60:
+            flash('Number 6 must be between 1 and 60')
+            return render_template('lottery/lottery.html', name="PLACEHOLDER FOR FIRSTNAME", form=form)
+
         submitted_numbers = (str(form.number1.data) + ' '
                           + str(form.number2.data) + ' '
                           + str(form.number3.data) + ' '
@@ -44,11 +63,11 @@ def create_draw():
                           + str(form.number5.data) + ' '
                           + str(form.number6.data))
 
-        secret_key = Fernet.generate_key()
-        encnumbers = Fernet(secret_key).encrypt(bytes(submitted_numbers, 'utf-8'))
+        ##secret_key = Fernet.generate_key()
+        ##encnumbers = Fernet(secret_key).encrypt(bytes(submitted_numbers, 'utf-8'))
         # create a new draw with the form data.
 
-        new_draw = Draw(user_id=current_user.id, numbers=encnumbers, master_draw=False, lottery_round=0, key=secret_key)
+        new_draw = Draw(user_id=current_user.id, numbers=submitted_numbers, master_draw=False, lottery_round=0)
         # add the new draw to the database
         db.session.add(new_draw)
         db.session.commit()

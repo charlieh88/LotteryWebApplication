@@ -7,3 +7,4 @@ WTForms
 werkzeug==2.3.7Flask
 pyotp
 flask-qrcode
+Flask-Bcrypt
